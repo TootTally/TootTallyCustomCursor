@@ -14,6 +14,7 @@ namespace TootTallyCustomCursor
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     [BepInDependency("TootTallyCore", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("TootTallySettings", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("TootTallyTournamentHost", BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin, ITootTallyModule
     {
         public static Plugin Instance;
@@ -23,7 +24,6 @@ namespace TootTallyCustomCursor
         public const string DEFAULT_CURSORNAME = "Default";
         public static string CURSORS_FOLDER_PATH = "CustomCursors";
 
-        public Options option;
         private Harmony _harmony;
         public ConfigEntry<bool> ModuleConfigEnabled { get; set; }
         public bool IsConfigInitialized { get; set; }
@@ -57,32 +57,28 @@ namespace TootTallyCustomCursor
         public void LoadModule()
         {
             string configPath = Path.Combine(Paths.BepInExRootPath, "config/");
-            ConfigFile config = new ConfigFile(configPath + CONFIG_NAME, true) {  SaveOnConfigSet = true };
-            option = new Options()
-            {
-                CursorName = config.Bind(CURSOR_CONFIG_FIELD, nameof(option.CursorName), DEFAULT_CURSORNAME),
-
-                CursorTrail = config.Bind(CURSOR_CONFIG_FIELD, nameof(option.CursorTrail), false),
-                TrailSize = config.Bind(CURSOR_CONFIG_FIELD, nameof(option.TrailSize), .5f),
-                TrailLength = config.Bind(CURSOR_CONFIG_FIELD, nameof(option.TrailLength), .1f),
-                TrailSpeed = config.Bind(CURSOR_CONFIG_FIELD, nameof(option.TrailSpeed), 15f),
-                TrailStartColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(option.TrailStartColor), Color.white),
-                TrailEndColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(option.TrailEndColor), Color.white),
-            };
+            ConfigFile config = new ConfigFile(configPath + CONFIG_NAME, true) { SaveOnConfigSet = true };
+            CursorName = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorName), DEFAULT_CURSORNAME);
+            CursorTrailName = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorTrailName), false);
+            TrailSize = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailSize), .5f);
+            TrailLength = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailLength), .1f);
+            TrailSpeed = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailSpeed), 15f);
+            TrailStartColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailStartColor), Color.white);
+            TrailEndColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailEndColor), Color.white);
 
             TryMigrateFolder("CustomCursors");
 
-            settingPage = TootTallySettingsManager.AddNewPage("Custom Cursor", "Custom Cursor", 40f, new Color(0,0,0,0));
-            CreateDropdownFromFolder(CURSORS_FOLDER_PATH, option.CursorName, DEFAULT_CURSORNAME);
+            settingPage = TootTallySettingsManager.AddNewPage("Custom Cursor", "Custom Cursor", 40f, new Color(0, 0, 0, 0));
+            CreateDropdownFromFolder(CURSORS_FOLDER_PATH, CursorName, DEFAULT_CURSORNAME);
             settingPage.AddLabel("CustomTrailLabel", "Custom Trail", 24, TMPro.FontStyles.Normal, TMPro.TextAlignmentOptions.BottomLeft);
-            settingPage.AddToggle("CursorTrail", option.CursorTrail);
-            settingPage.AddSlider("Trail Size", 0, 1, option.TrailSize, false);
-            settingPage.AddSlider("Trail Length", 0, 1, option.TrailLength, false);
-            settingPage.AddSlider("Trail Speed", 0, 100, option.TrailSpeed, false);
+            settingPage.AddToggle("CursorTrail", CursorTrailName);
+            settingPage.AddSlider("Trail Size", 0, 1, TrailSize, false);
+            settingPage.AddSlider("Trail Length", 0, 1, TrailLength, false);
+            settingPage.AddSlider("Trail Speed", 0, 100, TrailSpeed, false);
             settingPage.AddLabel("Trail Start Color");
-            settingPage.AddColorSliders("Trail Start Color", "Trail Start Color", option.TrailStartColor);
+            settingPage.AddColorSliders("Trail Start Color", "Trail Start Color", TrailStartColor);
             settingPage.AddLabel("Trail End Color");
-            settingPage.AddColorSliders("Trail End Color", "Trail End Color", option.TrailEndColor);
+            settingPage.AddColorSliders("Trail End Color", "Trail End Color", TrailEndColor);
 
             _harmony.PatchAll(typeof(CustomCursorPatches));
             LogInfo($"Module loaded!");
@@ -153,15 +149,12 @@ namespace TootTallyCustomCursor
             }
         }
 
-        public class Options
-        {
-            public ConfigEntry<string> CursorName { get; set; }
-            public ConfigEntry<bool> CursorTrail { get; set; }
-            public ConfigEntry<float> TrailSize { get; set; }
-            public ConfigEntry<float> TrailLength { get; set; }
-            public ConfigEntry<float> TrailSpeed { get; set; }
-            public ConfigEntry<Color> TrailStartColor { get; set; }
-            public ConfigEntry<Color> TrailEndColor { get; set; }
-        }
+        public ConfigEntry<string> CursorName { get; set; }
+        public ConfigEntry<bool> CursorTrailName { get; set; }
+        public ConfigEntry<float> TrailSize { get; set; }
+        public ConfigEntry<float> TrailLength { get; set; }
+        public ConfigEntry<float> TrailSpeed { get; set; }
+        public ConfigEntry<Color> TrailStartColor { get; set; }
+        public ConfigEntry<Color> TrailEndColor { get; set; }
     }
 }

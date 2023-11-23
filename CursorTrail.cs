@@ -15,8 +15,8 @@ namespace TootTallyCustomCursor
         private float _lifetime;
         private float _trailSpeed;
         private float _refreshRate;
-        private static Vector3 _velocity;
-        private static Vector3 _positionOffset;
+        private Vector3 _velocity;
+        private Vector3 _positionOffset;
 
         public void Awake()
         {

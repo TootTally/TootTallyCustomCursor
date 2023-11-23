@@ -72,13 +72,13 @@ namespace TootTallyCustomCursor
         public static void OnAllTextureLoadedAfterConfigChange(GameController __instance)
         {
             ApplyCustomTextureToCursor(__instance);
-            _lastCursorName = Plugin.Instance.option.CursorName.Value;
+            _lastCursorName = Plugin.Instance.CursorName.Value;
 
         }
 
         public static bool AreAllTexturesLoaded() => _noteTargetTexture != null && _noteDotTexture != null && _noteDotGlowTexture != null && _noteDotGlow1Texture != null;
 
-        public static bool ConfigCursorNameChanged() => Plugin.Instance.option.CursorName.Value != _lastCursorName;
+        public static bool ConfigCursorNameChanged() => Plugin.Instance.CursorName.Value != _lastCursorName;
 
         public static IEnumerator<UnityWebRequestAsyncOperation> LoadCursorTexture(string filePath, Action<Texture2D> callback)
         {
@@ -96,17 +96,17 @@ namespace TootTallyCustomCursor
             if (!AreAllTexturesLoaded()) return;
 
             Plugin.LogInfo("Applying Custom Textures to cursor.");
-            if (Plugin.Instance.option.CursorTrail.Value)
+            if (Plugin.Instance.CursorTrailName.Value)
             {
                 Plugin.Instance.StartCoroutine(LoadCursorTexture(_folderPath + "/trail.png", texture =>
                 {
                     __instance.pointer.AddComponent<CursorTrail>().Init(
-                        texture.height * Plugin.Instance.option.TrailSize.Value,
-                        Plugin.Instance.option.TrailLength.Value,
-                        Plugin.Instance.option.TrailSpeed.Value,
+                        texture.height * Plugin.Instance.TrailSize.Value,
+                        Plugin.Instance.TrailLength.Value,
+                        Plugin.Instance.TrailSpeed.Value,
                         60f,
-                        Plugin.Instance.option.TrailStartColor.Value,
-                        Plugin.Instance.option.TrailEndColor.Value,
+                        Plugin.Instance.TrailStartColor.Value,
+                        Plugin.Instance.TrailEndColor.Value,
                         __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
                         texture);
                 }));
@@ -133,12 +133,12 @@ namespace TootTallyCustomCursor
 
         public static void ResolvePresets(GameController __instance)
         {
-            if ((!AreAllTexturesLoaded() || __instance == null) && Plugin.Instance.option.CursorName.Value != Plugin.DEFAULT_CURSORNAME)
+            if ((!AreAllTexturesLoaded() || __instance == null) && Plugin.Instance.CursorName.Value != Plugin.DEFAULT_CURSORNAME)
             {
-                Plugin.LogInfo($"[{Plugin.Instance.option.CursorName.Value}] preset loading...");
-                LoadCursorTexture(__instance, Plugin.Instance.option.CursorName.Value);
+                Plugin.LogInfo($"[{Plugin.Instance.CursorName.Value}] preset loading...");
+                LoadCursorTexture(__instance, Plugin.Instance.CursorName.Value);
             }
-            else if (Plugin.Instance.option.CursorName.Value != Plugin.DEFAULT_CURSORNAME)
+            else if (Plugin.Instance.CursorName.Value != Plugin.DEFAULT_CURSORNAME)
                 ApplyCustomTextureToCursor(__instance);
             else
                 Plugin.LogInfo("[Default] preset selected. Not loading any Custom Cursor.");
