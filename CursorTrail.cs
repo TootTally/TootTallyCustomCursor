@@ -31,6 +31,7 @@ namespace TootTallyCustomCursor
         {
             _positionOffset = new Vector3(.7f, 0);
             _lineRenderer.sortingOrder = 51;
+            _lineRenderer.numCornerVertices = 5;
             _lineRenderer.alignment = LineAlignment.TransformZ;
             _lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
             _lineRenderer.startWidth = startWidth;
