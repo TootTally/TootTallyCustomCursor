@@ -5,6 +5,7 @@ using HarmonyLib;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TootTallyCore.Utils.Helpers;
 using TootTallyCore.Utils.TootTallyModules;
 using TootTallySettings;
 using UnityEngine;
@@ -66,7 +67,9 @@ namespace TootTallyCustomCursor
             TrailStartColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailStartColor), Color.white);
             TrailEndColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailEndColor), Color.white);
 
-            TryMigrateFolder("CustomCursors");
+            string sourceFolderPath = Path.Combine(Path.GetDirectoryName(Plugin.Instance.Info.Location), "CustomCursors");
+            string targetFolderPath = Path.Combine(Paths.BepInExRootPath, "CustomCursors");
+            FileHelper.TryMigrateFolder(sourceFolderPath, targetFolderPath, true);
 
             settingPage = TootTallySettingsManager.AddNewPage("Custom Cursor", "Custom Cursor", 40f, new Color(0, 0, 0, 0));
             CreateDropdownFromFolder(CURSORS_FOLDER_PATH, CursorName, DEFAULT_CURSORNAME);
@@ -89,22 +92,6 @@ namespace TootTallyCustomCursor
             _harmony.UnpatchSelf();
             settingPage.Remove();
             LogInfo($"Module unloaded!");
-        }
-
-        public void TryMigrateFolder(string folderName)
-        {
-            string sourceFolderPath = Path.Combine(Path.GetDirectoryName(Plugin.Instance.Info.Location), folderName);
-            if (Directory.Exists(sourceFolderPath))
-            {
-                string targetFolderPath = Path.Combine(Paths.BepInExRootPath, folderName);
-                if (Directory.Exists(targetFolderPath))
-                {
-                    if (Directory.Exists(targetFolderPath + "Old"))
-                        Directory.Delete(targetFolderPath + "Old");
-                    Directory.Move(targetFolderPath, targetFolderPath + "Old");
-                }
-                Directory.Move(sourceFolderPath, targetFolderPath);
-            }
         }
 
         public void CreateDropdownFromFolder(string folderName, ConfigEntry<string> config, string defaultValue)
