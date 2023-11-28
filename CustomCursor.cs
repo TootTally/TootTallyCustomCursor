@@ -17,41 +17,40 @@ namespace TootTallyCustomCursor
         private const string NOTEDOT_PATH = "GameplayCanvas/GameSpace/TargetNote/note-dot";
         private const string NOTEDOTGLOW_PATH = "GameplayCanvas/GameSpace/TargetNote/note-dot-glow";
         private const string NOTEDOTGLOW1_PATH = "GameplayCanvas/GameSpace/TargetNote/note-dot-glow/note-dot-glow (1)";
-        private static string _folderPath;
 
         private static Texture2D _noteTargetTexture, _noteDotTexture, _noteDotGlowTexture, _noteDotGlow1Texture;
         private static string _lastCursorName;
 
-        public static void LoadCursorTexture(GameController __instance, string CursorName)
+        public static void LoadCursorTexture(GameController __instance, string cursorName)
         {
             //If textures are already set, skip
             if (AreAllTexturesLoaded() && !ConfigCursorNameChanged()) return;
 
-            _folderPath = Path.Combine(Paths.BepInExRootPath, Plugin.CURSORS_FOLDER_PATH, CursorName);
+            var cursorPath = Path.Combine(Paths.BepInExRootPath, Plugin.CURSORS_FOLDER_PATH, cursorName);
 
             //Dont know which will request will finish first...
-            Plugin.Instance.StartCoroutine(LoadCursorTexture(_folderPath + "/TargetNote.png", texture =>
+            Plugin.Instance.StartCoroutine(LoadCursorTexture(cursorPath + "/TargetNote.png", texture =>
             {
                 _noteTargetTexture = texture;
                 Plugin.LogInfo("Target Texture Loaded.");
                 if (AreAllTexturesLoaded() && __instance != null)
                     OnAllTextureLoadedAfterConfigChange(__instance);
             }));
-            Plugin.Instance.StartCoroutine(LoadCursorTexture(_folderPath + "/note-dot.png", texture =>
+            Plugin.Instance.StartCoroutine(LoadCursorTexture(cursorPath + "/note-dot.png", texture =>
             {
                 _noteDotTexture = texture;
                 Plugin.LogInfo("Dot Texture Loaded.");
                 if (AreAllTexturesLoaded() && __instance != null)
                     OnAllTextureLoadedAfterConfigChange(__instance);
             }));
-            Plugin.Instance.StartCoroutine(LoadCursorTexture(_folderPath + "/note-dot-glow.png", texture =>
+            Plugin.Instance.StartCoroutine(LoadCursorTexture(cursorPath + "/note-dot-glow.png", texture =>
             {
                 _noteDotGlowTexture = texture;
                 Plugin.LogInfo("Dot Glow Texture Loaded.");
                 if (AreAllTexturesLoaded() && __instance != null)
                     OnAllTextureLoadedAfterConfigChange(__instance);
             }));
-            Plugin.Instance.StartCoroutine(LoadCursorTexture(_folderPath + "/note-dot-glow (1).png", texture =>
+            Plugin.Instance.StartCoroutine(LoadCursorTexture(cursorPath + "/note-dot-glow (1).png", texture =>
             {
                 _noteDotGlow1Texture = texture;
                 Plugin.LogInfo("Dot Glow1 Texture Loaded.");
@@ -96,24 +95,6 @@ namespace TootTallyCustomCursor
             if (!AreAllTexturesLoaded()) return;
 
             Plugin.LogInfo("Applying Custom Textures to cursor.");
-            if (Plugin.Instance.CursorTrailName.Value)
-            {
-                Plugin.Instance.StartCoroutine(LoadCursorTexture(_folderPath + "/trail.png", texture =>
-                {
-                    __instance.pointer.AddComponent<CursorTrail>().Init(
-                        texture.height * Plugin.Instance.TrailSize.Value,
-                        Plugin.Instance.TrailLength.Value,
-                        Plugin.Instance.TrailSpeed.Value,
-                        60f,
-                        Plugin.Instance.TrailStartColor.Value,
-                        Plugin.Instance.TrailEndColor.Value,
-                        __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
-                        texture);
-                }));
-
-            }
-
-
             GameObject noteTarget = GameObject.Find(NOTETARGET_PATH).gameObject;
             GameObject noteDot = GameObject.Find(NOTEDOT_PATH).gameObject;
             GameObject noteDotGlow = GameObject.Find(NOTEDOTGLOW_PATH).gameObject;
@@ -129,6 +110,24 @@ namespace TootTallyCustomCursor
             noteDotGlow1.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotGlow1Texture.width, _noteDotGlow1Texture.height) / 2;
 
             __instance.dotsize = _noteTargetTexture.width / 2;
+        }
+
+        public static void AddTrail(GameController __instance, string cursorName)
+        {
+            var trailPath = Path.Combine(Paths.BepInExRootPath, Plugin.CURSORS_FOLDER_PATH, cursorName);
+
+            Plugin.Instance.StartCoroutine(LoadCursorTexture(trailPath + "/trail.png", texture =>
+            {
+                __instance.pointer.AddComponent<CursorTrail>().Init(
+                    texture.height * Plugin.Instance.TrailSize.Value,
+                    Plugin.Instance.TrailLength.Value,
+                    Plugin.Instance.TrailSpeed.Value,
+                    120f,
+                    Plugin.Instance.TrailStartColor.Value,
+                    Plugin.Instance.TrailEndColor.Value,
+                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
+                    texture);
+            }));
         }
 
         public static void ResolvePresets(GameController __instance)

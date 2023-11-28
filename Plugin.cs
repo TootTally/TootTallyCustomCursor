@@ -93,18 +93,17 @@ namespace TootTallyCustomCursor
 
         public void TryMigrateFolder(string folderName)
         {
-            string targetFolderPath = Path.Combine(Paths.BepInExRootPath, folderName);
-            if (!Directory.Exists(targetFolderPath))
+            string sourceFolderPath = Path.Combine(Path.GetDirectoryName(Plugin.Instance.Info.Location), folderName);
+            if (Directory.Exists(sourceFolderPath))
             {
-                string sourceFolderPath = Path.Combine(Path.GetDirectoryName(Plugin.Instance.Info.Location), folderName);
-                LogInfo($"{folderName} folder not found. Attempting to move folder from " + sourceFolderPath + " to " + targetFolderPath);
-                if (Directory.Exists(sourceFolderPath))
-                    Directory.Move(sourceFolderPath, targetFolderPath);
-                else
+                string targetFolderPath = Path.Combine(Paths.BepInExRootPath, folderName);
+                if (Directory.Exists(targetFolderPath))
                 {
-                    LogError($"Source {folderName} Folder Not Found. Cannot Create {folderName} Folder. Download the module again to fix the issue.");
-                    return;
+                    if (Directory.Exists(targetFolderPath + "Old"))
+                        Directory.Delete(targetFolderPath + "Old");
+                    Directory.Move(targetFolderPath, targetFolderPath + "Old");
                 }
+                Directory.Move(sourceFolderPath, targetFolderPath);
             }
         }
 
@@ -146,6 +145,12 @@ namespace TootTallyCustomCursor
             public static void PatchCustorTexture(GameController __instance)
             {
                 CustomCursor.ResolvePresets(__instance);
+
+                if (Plugin.Instance.CursorTrailName.Value)
+                {
+                    var cursorName = Plugin.Instance.CursorName.Value != Plugin.DEFAULT_CURSORNAME ? Plugin.Instance.CursorName.Value : "TEMPLATE";
+                    CustomCursor.AddTrail(__instance, cursorName);
+                }
             }
         }
 
