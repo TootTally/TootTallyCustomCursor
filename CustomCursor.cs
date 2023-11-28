@@ -122,7 +122,6 @@ namespace TootTallyCustomCursor
                     texture.height * Plugin.Instance.TrailSize.Value,
                     Plugin.Instance.TrailLength.Value,
                     Plugin.Instance.TrailSpeed.Value,
-                    120f,
                     Plugin.Instance.TrailStartColor.Value,
                     Plugin.Instance.TrailEndColor.Value,
                     __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,

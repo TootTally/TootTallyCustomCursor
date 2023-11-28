@@ -14,7 +14,6 @@ namespace TootTallyCustomCursor
         private LineRenderer _lineRenderer;
         private float _lifetime;
         private float _trailSpeed;
-        private float _refreshRate;
         private Vector3 _velocity;
         private Vector3 _positionOffset;
 
@@ -28,7 +27,7 @@ namespace TootTallyCustomCursor
             AddPoint(0);
         }
 
-        public void Init(float startWidth, float lifetime, float trailSpeed, float refreshRate, Color startColor, Color endColor, Material defaultMat, Texture2D texture = null)
+        public void Init(float startWidth, float lifetime, float trailSpeed, Color startColor, Color endColor, Material defaultMat, Texture2D texture = null)
         {
             _positionOffset = new Vector3(.7f, 0);
             _lineRenderer.sortingOrder = 51;
@@ -44,7 +43,6 @@ namespace TootTallyCustomCursor
             _lineRenderer.endColor = endColor;
             _lifetime = lifetime;
             _trailSpeed = trailSpeed;
-            _refreshRate = refreshRate;
         }
 
         public void Update()
@@ -53,7 +51,7 @@ namespace TootTallyCustomCursor
             while (_verticesTimes.Count > 2 && _verticesTimes.Peek() + _lifetime < time)
                 RemovePoint();
 
-            if (_verticesTimes.Count > 0 && time - _verticesTimes.Last() > 1f / _refreshRate || _verticesList.Count < 2)
+            if (_verticesTimes.Count > 0 || _verticesList.Count < 2)
                 AddPoint(time);
 
             _velocity.x = -Time.deltaTime * _trailSpeed;
