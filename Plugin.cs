@@ -83,6 +83,8 @@ namespace TootTallyCustomCursor
             settingPage.AddLabel("Trail End Color");
             settingPage.AddColorSliders("Trail End Color", "Trail End Color", TrailEndColor);
 
+            TootTallySettings.Plugin.TryAddThunderstoreIconToPageButton(Instance.Info.Location, Name, settingPage);
+
             _harmony.PatchAll(typeof(CustomCursorPatches));
             LogInfo($"Module loaded!");
         }
