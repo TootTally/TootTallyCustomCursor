@@ -74,7 +74,7 @@ namespace TootTallyCustomCursor
             settingPage = TootTallySettingsManager.AddNewPage("Custom Cursor", "Custom Cursor", 40f, new Color(0, 0, 0, 0));
             CreateDropdownFromFolder(CURSORS_FOLDER_PATH, CursorName, DEFAULT_CURSORNAME);
             settingPage.AddLabel("CustomTrailLabel", "Custom Trail", 24, TMPro.FontStyles.Normal, TMPro.TextAlignmentOptions.BottomLeft);
-            settingPage.AddToggle("CursorTrail", CursorTrailName);
+            settingPage.AddToggle("Enable Cursor Trail", CursorTrailName);
             settingPage.AddSlider("Trail Size", 0, 1, TrailSize, false);
             settingPage.AddSlider("Trail Length", 0, 1, TrailLength, false);
             settingPage.AddSlider("Trail Speed", 0, 100, TrailSpeed, false);
