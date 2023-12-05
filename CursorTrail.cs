@@ -15,8 +15,6 @@ namespace TootTallyCustomCursor
         private float _lifetime;
         private float _trailSpeed;
         private Vector3 _velocity;
-        private Vector3 _positionOffset;
-        private bool _isPreview;
 
         public void Awake()
         {
@@ -28,45 +26,36 @@ namespace TootTallyCustomCursor
             AddPoint(0);
         }
 
-        public void Init(float startWidth, float lifetime, float trailSpeed, Color startColor, Color endColor, Material defaultMat, Texture2D texture = null)
+        public void Init(float startWidth, float lifetime, float trailSpeed, Color startColor, Color endColor, Material material, int renderQueue, Texture2D texture = null)
         {
-            _positionOffset = new Vector3(.7f, 0);
             _lineRenderer.sortingOrder = 51;
-            _lineRenderer.numCornerVertices = 5;
+            _lineRenderer.numCapVertices = 20;
             _lineRenderer.alignment = LineAlignment.TransformZ;
             _lineRenderer.textureMode = LineTextureMode.DistributePerSegment;
-            _lineRenderer.startWidth = startWidth;
             _lineRenderer.endWidth = 0;
-            if (defaultMat != null)
-                _lineRenderer.material = GameObject.Instantiate(defaultMat);
-            _lineRenderer.material.renderQueue = 3500;
+            _lineRenderer.startWidth = startWidth;
+            if (material != null)
+                _lineRenderer.material = GameObject.Instantiate(material);
+            _lineRenderer.material.renderQueue = renderQueue;
             if (texture != null)
                 _lineRenderer.material.mainTexture = texture;
-            _lineRenderer.startColor = startColor;
-            _lineRenderer.endColor = endColor;
+
+            _lineRenderer.colorGradient = new Gradient()
+            {
+                mode = GradientMode.Blend,
+                colorKeys = new GradientColorKey[]
+                {
+                    new GradientColorKey(startColor, 0f),
+                    new GradientColorKey(endColor, 1f)
+                }
+            };
             _lifetime = lifetime;
             _trailSpeed = trailSpeed;
-        }
-
-        public void SetupPreview()
-        {
-            _lineRenderer.material.renderQueue = 2500;
-            _positionOffset = new Vector2(-.3f, 0);
-            _isPreview = true;
         }
 
         public void Update()
         {
             var time = Time.time;
-
-            if (_isPreview)
-            {
-                _lineRenderer.startWidth = Plugin.Instance.TrailSize.Value * _lineRenderer.material.mainTexture.height * 1.8f;
-                _lineRenderer.startColor = Plugin.Instance.TrailStartColor.Value;
-                _lineRenderer.endColor = Plugin.Instance.TrailEndColor.Value;
-                _lifetime = Plugin.Instance.TrailLength.Value * 1.8f;
-                _trailSpeed = Plugin.Instance.TrailSpeed.Value * 1.8f;
-            }
 
             while (_verticesTimes.Count > 2 && _verticesTimes.Peek() + _lifetime < time)
                 RemovePoint();
@@ -84,21 +73,64 @@ namespace TootTallyCustomCursor
             _lineRenderer.SetPositions(_verticesList.ToArray());
         }
 
+        public void SetWidth(float width)
+        {
+            _lineRenderer.startWidth = width;
+        }
+
+        public void UpdateColors()
+        {
+            _lineRenderer.colorGradient = new Gradient()
+            {
+                mode = GradientMode.Blend,
+                colorKeys = new GradientColorKey[]
+                {
+                    new GradientColorKey(Plugin.Instance.TrailStartColor.Value, 0f),
+                    new GradientColorKey(Plugin.Instance.TrailEndColor.Value, 1f)
+                }
+            };
+        }
+
+        public void SetColors(GradientColorKey[] colors)
+        {
+            _lineRenderer.colorGradient = new Gradient()
+            {
+                mode = GradientMode.Blend,
+                colorKeys = colors
+            };
+        }
+
+        public void SetLifetime(float lifetime)
+        {
+            _lifetime = lifetime;
+        }
+
+        public void SetTrailSpeed(float trailSpeed)
+        {
+            _trailSpeed = trailSpeed;
+        }
+
         private void AddPoint(float time)
         {
             _verticesTimes.Enqueue(time);
-            _verticesList.Insert(1, gameObject.transform.position + _positionOffset);
+            _verticesList.Insert(1, gameObject.transform.position);
         }
 
         private void SetFirstVerticePosition()
         {
-            _verticesList[0] = gameObject.transform.position + _positionOffset;
+            _verticesList[0] = gameObject.transform.position;
         }
 
         private void RemovePoint()
         {
             _verticesTimes.Dequeue();
             _verticesList.RemoveAt(_verticesList.Count - 1);
+        }
+
+        public void Dispose()
+        {
+            GameObject.DestroyImmediate(_lineRenderer);
+            GameObject.DestroyImmediate(this);
         }
     }
 }

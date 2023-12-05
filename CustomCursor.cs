@@ -24,6 +24,8 @@ namespace TootTallyCustomCursor
 
         public static Texture2D[] GetTextures => new Texture2D[] { _noteTargetTexture, _noteDotTexture, _trailTexture };
 
+        public static Action<GameController> OnTextureLoaded = OnAllTextureLoadedAfterConfigChange;
+
         public static void LoadCursorTexture(GameController __instance, string cursorName)
         {
             //If textures are already set, skip
@@ -36,36 +38,37 @@ namespace TootTallyCustomCursor
             {
                 _noteTargetTexture = texture;
                 Plugin.LogInfo("Target Texture Loaded.");
-                if (AreAllTexturesLoaded() && __instance != null)
-                    OnAllTextureLoadedAfterConfigChange(__instance);
+                if (AreAllTexturesLoaded())
+                    OnTextureLoaded.Invoke(__instance);
             }));
             Plugin.Instance.StartCoroutine(LoadCursorTexture(cursorPath + "/note-dot.png", texture =>
             {
                 _noteDotTexture = texture;
                 Plugin.LogInfo("Dot Texture Loaded.");
-                if (AreAllTexturesLoaded() && __instance != null)
-                    OnAllTextureLoadedAfterConfigChange(__instance);
+                if (AreAllTexturesLoaded())
+                    OnTextureLoaded.Invoke(__instance);
+
             }));
             Plugin.Instance.StartCoroutine(LoadCursorTexture(cursorPath + "/note-dot-glow.png", texture =>
             {
                 _noteDotGlowTexture = texture;
                 Plugin.LogInfo("Dot Glow Texture Loaded.");
-                if (AreAllTexturesLoaded() && __instance != null)
-                    OnAllTextureLoadedAfterConfigChange(__instance);
+                if (AreAllTexturesLoaded())
+                    OnTextureLoaded.Invoke(__instance);
             }));
             Plugin.Instance.StartCoroutine(LoadCursorTexture(cursorPath + "/note-dot-glow (1).png", texture =>
             {
                 _noteDotGlow1Texture = texture;
                 Plugin.LogInfo("Dot Glow1 Texture Loaded.");
-                if (AreAllTexturesLoaded() && __instance != null)
-                    OnAllTextureLoadedAfterConfigChange(__instance);
+                if (AreAllTexturesLoaded())
+                    OnTextureLoaded.Invoke(__instance);
             }));
             Plugin.Instance.StartCoroutine(LoadCursorTexture(cursorPath + "/trail.png", texture =>
             {
                 _trailTexture = texture;
                 Plugin.LogInfo("Trail Texture Loaded.");
-                if (AreAllTexturesLoaded() && __instance != null)
-                    OnAllTextureLoadedAfterConfigChange(__instance);
+                if (AreAllTexturesLoaded())
+                    OnTextureLoaded.Invoke(__instance);
             }));
         }
 
@@ -81,6 +84,7 @@ namespace TootTallyCustomCursor
 
         public static void OnAllTextureLoadedAfterConfigChange(GameController __instance)
         {
+            if (__instance == null) return;
             ApplyCustomTextureToCursor(__instance);
             _lastCursorName = Plugin.Instance.CursorName.Value;
 
@@ -106,10 +110,12 @@ namespace TootTallyCustomCursor
             if (!AreAllTexturesLoaded()) return;
 
             Plugin.LogInfo("Applying Custom Textures to cursor.");
+
             GameObject noteTarget = GameObject.Find(NOTETARGET_PATH).gameObject;
             GameObject noteDot = GameObject.Find(NOTEDOT_PATH).gameObject;
             GameObject noteDotGlow = GameObject.Find(NOTEDOTGLOW_PATH).gameObject;
             GameObject noteDotGlow1 = GameObject.Find(NOTEDOTGLOW1_PATH).gameObject;
+
 
             noteTarget.GetComponent<Image>().sprite = Sprite.Create(_noteTargetTexture, new Rect(0, 0, _noteTargetTexture.width, _noteTargetTexture.height), Vector2.one);
             noteTarget.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteTargetTexture.width, _noteTargetTexture.height) / 2;
@@ -120,7 +126,6 @@ namespace TootTallyCustomCursor
             noteDotGlow1.GetComponent<Image>().sprite = Sprite.Create(_noteDotGlow1Texture, new Rect(0, 0, _noteDotGlow1Texture.width, _noteDotGlow1Texture.height), Vector2.zero);
             noteDotGlow1.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotGlow1Texture.width, _noteDotGlow1Texture.height) / 2;
 
-            __instance.dotsize = _noteTargetTexture.width / 2;
         }
 
         public static void AddTrail(GameController __instance)
@@ -134,8 +139,27 @@ namespace TootTallyCustomCursor
                    Plugin.Instance.TrailStartColor.Value,
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
+                   3500,
                    _trailTexture);
             }
+            else //Means you're using default cursor
+            {
+                var trailPath = Path.Combine(Paths.BepInExRootPath, Plugin.CURSORS_FOLDER_PATH, "TEMPLATE/trail.png");
+                Plugin.Instance.StartCoroutine(LoadCursorTexture(trailPath, texture =>
+                {
+                    _trailTexture = texture;
+                    __instance.pointer.AddComponent<CursorTrail>().Init(
+                   _trailTexture.height * Plugin.Instance.TrailSize.Value,
+                   Plugin.Instance.TrailLength.Value,
+                   Plugin.Instance.TrailSpeed.Value,
+                   Plugin.Instance.TrailStartColor.Value,
+                   Plugin.Instance.TrailEndColor.Value,
+                   __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
+                   3500,
+                   _trailTexture);
+                }));
+            }
+
         }
 
         public static void ResolvePresets(GameController __instance)
@@ -148,7 +172,11 @@ namespace TootTallyCustomCursor
             else if (Plugin.Instance.CursorName.Value != Plugin.DEFAULT_CURSORNAME)
                 ApplyCustomTextureToCursor(__instance);
             else
+            {
+                UnloadTextures();
+                OnTextureLoaded.Invoke(__instance);
                 Plugin.LogInfo("[Default] preset selected. Not loading any Custom Cursor.");
+            }
         }
     }
 }
