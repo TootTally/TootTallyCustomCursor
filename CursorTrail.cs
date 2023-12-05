@@ -16,6 +16,7 @@ namespace TootTallyCustomCursor
         private float _trailSpeed;
         private Vector3 _velocity;
         private Vector3 _positionOffset;
+        private bool _isPreview;
 
         public void Awake()
         {
@@ -33,10 +34,11 @@ namespace TootTallyCustomCursor
             _lineRenderer.sortingOrder = 51;
             _lineRenderer.numCornerVertices = 5;
             _lineRenderer.alignment = LineAlignment.TransformZ;
-            _lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
+            _lineRenderer.textureMode = LineTextureMode.DistributePerSegment;
             _lineRenderer.startWidth = startWidth;
             _lineRenderer.endWidth = 0;
-            _lineRenderer.material = GameObject.Instantiate(defaultMat);
+            if (defaultMat != null)
+                _lineRenderer.material = GameObject.Instantiate(defaultMat);
             _lineRenderer.material.renderQueue = 3500;
             if (texture != null)
                 _lineRenderer.material.mainTexture = texture;
@@ -46,9 +48,26 @@ namespace TootTallyCustomCursor
             _trailSpeed = trailSpeed;
         }
 
+        public void SetupPreview()
+        {
+            _lineRenderer.material.renderQueue = 2500;
+            _positionOffset = new Vector2(-.3f, 0);
+            _isPreview = true;
+        }
+
         public void Update()
         {
             var time = Time.time;
+
+            if (_isPreview)
+            {
+                _lineRenderer.startWidth = Plugin.Instance.TrailSize.Value * _lineRenderer.material.mainTexture.height * 1.8f;
+                _lineRenderer.startColor = Plugin.Instance.TrailStartColor.Value;
+                _lineRenderer.endColor = Plugin.Instance.TrailEndColor.Value;
+                _lifetime = Plugin.Instance.TrailLength.Value * 1.8f;
+                _trailSpeed = Plugin.Instance.TrailSpeed.Value * 1.8f;
+            }
+
             while (_verticesTimes.Count > 2 && _verticesTimes.Peek() + _lifetime < time)
                 RemovePoint();
 
