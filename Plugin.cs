@@ -106,8 +106,6 @@ namespace TootTallyCustomCursor
             [HarmonyPostfix]
             public static void PatchCustorTexture(GameController __instance)
             {
-                __instance.pointer.GetComponent<RectTransform>().pivot = Vector2.one / 2f;
-                __instance.dotsize = 0;
                 CustomCursor.ResolvePresets(__instance);
 
                 if (Plugin.Instance.CursorTrailEnabled.Value)
