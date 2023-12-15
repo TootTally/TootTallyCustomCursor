@@ -14,7 +14,9 @@ namespace TootTallyCustomCursor
         private LineRenderer _lineRenderer;
         private float _lifetime;
         private float _trailSpeed;
+        private int _refreshRate;
         private Vector3 _velocity;
+        private Vector3 _trailHeadPosition;
 
         public void Awake()
         {
@@ -23,10 +25,11 @@ namespace TootTallyCustomCursor
             _verticesTimes = new Queue<float>();
             _verticesList = new List<Vector3>() { gameObject.transform.position };
             _velocity = Vector3.zero;
+            _trailHeadPosition = gameObject.transform.position;
             AddPoint(0);
         }
 
-        public void Init(float startWidth, float lifetime, float trailSpeed, Color startColor, Color endColor, Material material, int renderQueue, Texture2D texture = null)
+        public void Init(float startWidth, float lifetime, float trailSpeed, Color startColor, Color endColor, Material material, int renderQueue, int refreshRate, Texture2D texture = null)
         {
             _lineRenderer.sortingOrder = 51;
             _lineRenderer.numCapVertices = 20;
@@ -51,22 +54,31 @@ namespace TootTallyCustomCursor
             };
             _lifetime = lifetime;
             _trailSpeed = trailSpeed;
+            _refreshRate = refreshRate;
         }
 
         public void Update()
         {
             var time = Time.time;
 
+            var distance = _trailHeadPosition.y - gameObject.transform.position.y;
+            if (distance != 0)
+            {
+                _trailHeadPosition.y -= distance / 2f * Time.deltaTime * 250f;
+                if (distance < 0 && _trailHeadPosition.y > gameObject.transform.position.y || 
+                   (distance > 0 && _trailHeadPosition.y < gameObject.transform.position.y))
+                    _trailHeadPosition.y = gameObject.transform.position.y;
+            }
+
+
             while (_verticesTimes.Count > 2 && _verticesTimes.Peek() + _lifetime < time)
                 RemovePoint();
-
-            if (_verticesTimes.Count > 0 || _verticesList.Count < 2)
+            if (_refreshRate == 0 || time - _verticesTimes.Last() > 1f / _refreshRate)
                 AddPoint(time);
 
             _velocity.x = -Time.deltaTime * _trailSpeed;
             for (int i = 1; i < _verticesList.Count; i++)
                 _verticesList[i] += _velocity;
-
             SetFirstVerticePosition();
 
             _lineRenderer.positionCount = _verticesList.Count;
@@ -110,15 +122,20 @@ namespace TootTallyCustomCursor
             _trailSpeed = trailSpeed;
         }
 
+        public void SetRefreshRate(int refreshRate)
+        {
+            _refreshRate = refreshRate;
+        }
+
         private void AddPoint(float time)
         {
             _verticesTimes.Enqueue(time);
-            _verticesList.Insert(1, gameObject.transform.position);
+            _verticesList.Insert(1, _trailHeadPosition);
         }
 
         private void SetFirstVerticePosition()
         {
-            _verticesList[0] = gameObject.transform.position;
+            _verticesList[0] = _trailHeadPosition;
         }
 
         private void RemovePoint()

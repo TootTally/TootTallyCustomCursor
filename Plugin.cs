@@ -71,6 +71,7 @@ namespace TootTallyCustomCursor
             TrailSpeed = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailSpeed), 15f);
             TrailStartColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailStartColor), Color.white);
             TrailEndColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailEndColor), Color.white);
+            TrailRefreshRate = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailRefreshRate), 0f, "Set to 0 for uncapped.");
 
             string sourceFolderPath = Path.Combine(Path.GetDirectoryName(Plugin.Instance.Info.Location), "CustomCursors");
             string targetFolderPath = Path.Combine(Paths.BepInExRootPath, "CustomCursors");
@@ -118,6 +119,7 @@ namespace TootTallyCustomCursor
         public ConfigEntry<float> TrailSize { get; set; }
         public ConfigEntry<float> TrailLength { get; set; }
         public ConfigEntry<float> TrailSpeed { get; set; }
+        public ConfigEntry<float> TrailRefreshRate { get; set; }
         public ConfigEntry<Color> TrailStartColor { get; set; }
         public ConfigEntry<Color> TrailEndColor { get; set; }
     }

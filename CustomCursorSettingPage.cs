@@ -26,7 +26,7 @@ namespace TootTallyCustomCursor
         };
 
         private TootTallySettingDropdown _cursorDropdown;
-        private TootTallySettingSlider _trailSizeSlider, _trailLengthSlider, _trailSpeedSlider;
+        private TootTallySettingSlider _trailSizeSlider, _trailLengthSlider, _trailSpeedSlider, _trailRefreshRateSlider;
         private TootTallySettingColorSliders _trailStartColorSliders, _trailEndColorSliders;
         private TootTallySettingToggle _trailToggle;
 
@@ -38,6 +38,7 @@ namespace TootTallyCustomCursor
             _trailSizeSlider = AddSlider("Trail Size", 0, 1, Plugin.Instance.TrailSize, false);
             _trailLengthSlider = AddSlider("Trail Length", 0, 1, Plugin.Instance.TrailLength, false);
             _trailSpeedSlider = AddSlider("Trail Speed", 0, 100, Plugin.Instance.TrailSpeed, false);
+            _trailRefreshRateSlider = AddSlider("Trail Refresh Rate", 0, 200, Plugin.Instance.TrailRefreshRate, true);
             AddLabel("Trail Start Color");
             _trailStartColorSliders = AddColorSliders("Trail Start Color", "Trail Start Color", Plugin.Instance.TrailStartColor);
             AddLabel("Trail End Color");
@@ -61,6 +62,7 @@ namespace TootTallyCustomCursor
             _trailLengthSlider.slider.onValueChanged.AddListener(value => _trailPreview?.SetLifetime(value));
             _trailSpeedSlider.slider.onValueChanged.AddListener(value => _trailPreview?.SetTrailSpeed(value * 3.4f));
             _trailSizeSlider.slider.onValueChanged.AddListener(value => _trailPreview?.SetWidth(value * _trailTexture.height * 2f));
+            _trailRefreshRateSlider.slider.onValueChanged.AddListener(value => _trailPreview?.SetRefreshRate((int)value));
         }
 
         private void UpdateColor(float f) => _trailPreview?.UpdateColors();
@@ -145,6 +147,7 @@ namespace TootTallyCustomCursor
                   Plugin.Instance.TrailEndColor.Value,
                   defaultLineMat,
                   2500,
+                  (int)Plugin.Instance.TrailRefreshRate.Value,
                   _trailTexture);
                 }
                 else
@@ -161,6 +164,7 @@ namespace TootTallyCustomCursor
                        Plugin.Instance.TrailEndColor.Value,
                        defaultLineMat,
                        2500,
+                       (int)Plugin.Instance.TrailRefreshRate.Value,
                        _trailTexture);
                     }));
                 }

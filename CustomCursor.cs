@@ -140,6 +140,7 @@ namespace TootTallyCustomCursor
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
                    3500,
+                   (int)Plugin.Instance.TrailRefreshRate.Value,
                    _trailTexture);
             }
             else //Means you're using default cursor
@@ -156,6 +157,7 @@ namespace TootTallyCustomCursor
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
                    3500,
+                   (int)Plugin.Instance.TrailRefreshRate.Value,
                    _trailTexture);
                 }));
             }
