@@ -16,7 +16,6 @@ namespace TootTallyCustomCursor
         private float _trailSpeed;
         private int _refreshRate;
         private Vector3 _velocity;
-        private Vector3 _trailHeadPosition;
 
         public void Awake()
         {
@@ -25,7 +24,6 @@ namespace TootTallyCustomCursor
             _verticesTimes = new Queue<float>();
             _verticesList = new List<Vector3>() { gameObject.transform.position };
             _velocity = Vector3.zero;
-            _trailHeadPosition = gameObject.transform.position;
             AddPoint(0);
         }
 
@@ -61,19 +59,14 @@ namespace TootTallyCustomCursor
         {
             var time = Time.time;
 
-            var distance = _trailHeadPosition.y - gameObject.transform.position.y;
-            if (distance != 0)
-            {
-                _trailHeadPosition.y -= distance / 2f * Time.deltaTime * 250f;
-                if (distance < 0 && _trailHeadPosition.y > gameObject.transform.position.y || 
-                   (distance > 0 && _trailHeadPosition.y < gameObject.transform.position.y))
-                    _trailHeadPosition.y = gameObject.transform.position.y;
-            }
-
-
             while (_verticesTimes.Count > 2 && _verticesTimes.Peek() + _lifetime < time)
                 RemovePoint();
-            if (_refreshRate == 0 || time - _verticesTimes.Last() > 1f / _refreshRate)
+
+            var distance = (int)((_verticesList.First().y - gameObject.transform.position.y) * 1000);
+
+            if (distance != 0)
+                AddPoint(time);
+            else if (time - _verticesTimes.Last() > 1f / 120f && distance == 0)
                 AddPoint(time);
 
             _velocity.x = -Time.deltaTime * _trailSpeed;
@@ -130,12 +123,12 @@ namespace TootTallyCustomCursor
         private void AddPoint(float time)
         {
             _verticesTimes.Enqueue(time);
-            _verticesList.Insert(1, _trailHeadPosition);
+            _verticesList.Insert(1, gameObject.transform.position);
         }
 
         private void SetFirstVerticePosition()
         {
-            _verticesList[0] = _trailHeadPosition;
+            _verticesList[0] = gameObject.transform.position;
         }
 
         private void RemovePoint()
