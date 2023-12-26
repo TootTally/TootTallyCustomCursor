@@ -66,7 +66,7 @@ namespace TootTallyCustomCursor
 
             if (distance != 0)
                 AddPoint(time);
-            else if (time - _verticesTimes.Last() > 1f / 120f && distance == 0)
+            else if (_refreshRate == 0 || (time - _verticesTimes.Last() > 1f / _refreshRate && distance == 0))
                 AddPoint(time);
 
             _velocity.x = -Time.deltaTime * _trailSpeed;
