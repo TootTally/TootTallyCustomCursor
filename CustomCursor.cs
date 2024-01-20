@@ -112,6 +112,7 @@ namespace TootTallyCustomCursor
             Plugin.LogInfo("Applying Custom Textures to cursor.");
 
             GameObject noteTarget = GameObject.Find(NOTETARGET_PATH).gameObject;
+            noteTarget.transform.localScale = Vector3.one * Plugin.Instance.CursorSize.Value;
             GameObject noteDot = GameObject.Find(NOTEDOT_PATH).gameObject;
             GameObject noteDotGlow = GameObject.Find(NOTEDOTGLOW_PATH).gameObject;
             GameObject noteDotGlow1 = GameObject.Find(NOTEDOTGLOW1_PATH).gameObject;

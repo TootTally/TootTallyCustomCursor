@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TootTallyCore.Graphics.Animations;
 using TMPro;
+using UnityEngine.PostProcessing;
 
 namespace TootTallyCustomCursor
 {
@@ -26,13 +27,14 @@ namespace TootTallyCustomCursor
         };
 
         private TootTallySettingDropdown _cursorDropdown;
-        private TootTallySettingSlider _trailSizeSlider, _trailLengthSlider, _trailSpeedSlider, _trailRefreshRateSlider;
+        private TootTallySettingSlider _cursorSizeSlider, _trailSizeSlider, _trailLengthSlider, _trailSpeedSlider, _trailRefreshRateSlider;
         private TootTallySettingColorSliders _trailStartColorSliders, _trailEndColorSliders;
         private TootTallySettingToggle _trailToggle;
 
         public CustomCursorSettingPage() : base("Custom Cursor", "Custom Cursor", 40f, new Color(0, 0, 0, 0), _pageBtnColors)
         {
             _cursorDropdown = CreateDropdownFromFolder(Plugin.CURSORS_FOLDER_PATH, Plugin.Instance.CursorName, Plugin.DEFAULT_CURSORNAME);
+            _cursorSizeSlider = AddSlider("Cursor Size", .01f, 2f, Plugin.Instance.CursorSize, false);
             AddLabel("CustomTrailLabel", "Custom Trail", 24, FontStyles.Normal, TextAlignmentOptions.BottomLeft);
             _trailToggle = AddToggle("Enable Cursor Trail", Plugin.Instance.CursorTrailEnabled);
             _trailSizeSlider = AddSlider("Trail Size", 0, 1, Plugin.Instance.TrailSize, false);
@@ -53,6 +55,7 @@ namespace TootTallyCustomCursor
                 CustomCursor.ResolvePresets(null);
             });
             _trailToggle.toggle.onValueChanged.AddListener(OnTrailToggle);
+            _cursorSizeSlider.slider.onValueChanged.AddListener(OnCursorSizeChange);
             _trailStartColorSliders.sliderR.onValueChanged.AddListener(UpdateColor);
             _trailStartColorSliders.sliderG.onValueChanged.AddListener(UpdateColor);
             _trailStartColorSliders.sliderB.onValueChanged.AddListener(UpdateColor);
@@ -65,9 +68,13 @@ namespace TootTallyCustomCursor
             _trailRefreshRateSlider.slider.onValueChanged.AddListener(value => _trailPreview?.SetRefreshRate((int)value));
         }
 
+        private void OnCursorSizeChange(float value)
+        {
+            _cursorPreview.transform.localScale = Vector3.one * value;
+        }
+
         private void UpdateColor(float f) => _trailPreview?.UpdateColors();
 
-        public Material defaultLineMat;
         public GameObject defaultCursor;
 
         private GameObject _cursorPreview;
@@ -96,6 +103,7 @@ namespace TootTallyCustomCursor
                 DestroyPreview();
 
             _cursorPreview = GameObject.Instantiate(defaultCursor, gridPanel.transform.parent);
+            _cursorPreview.transform.localScale = Vector3.one * Plugin.Instance.CursorSize.Value;
             GameObject noteDot = _cursorPreview.transform.Find("note-dot").gameObject;
 
             _cursorPreview.GetComponent<RectTransform>().anchoredPosition = new Vector2(950, 100);
@@ -145,7 +153,7 @@ namespace TootTallyCustomCursor
                   Plugin.Instance.TrailSpeed.Value * 3.4f,
                   Plugin.Instance.TrailStartColor.Value,
                   Plugin.Instance.TrailEndColor.Value,
-                  defaultLineMat,
+                  Material.GetDefaultLineMaterial(),
                   2500,
                   (int)Plugin.Instance.TrailRefreshRate.Value,
                   _trailTexture);
@@ -162,16 +170,12 @@ namespace TootTallyCustomCursor
                        Plugin.Instance.TrailSpeed.Value * 3.4f,
                        Plugin.Instance.TrailStartColor.Value,
                        Plugin.Instance.TrailEndColor.Value,
-                       defaultLineMat,
+                       Material.GetDefaultLineMaterial(),
                        2500,
                        (int)Plugin.Instance.TrailRefreshRate.Value,
                        _trailTexture);
                     }));
                 }
-
-                
-
-
             }
             else if (_trailPreview != null && !value)
             {

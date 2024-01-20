@@ -65,6 +65,7 @@ namespace TootTallyCustomCursor
             string configPath = Path.Combine(Paths.BepInExRootPath, "config/");
             ConfigFile config = new ConfigFile(configPath + CONFIG_NAME, true) { SaveOnConfigSet = true };
             CursorName = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorName), DEFAULT_CURSORNAME);
+            CursorSize = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorSize), 1f);
             CursorTrailEnabled = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorTrailEnabled), false);
             TrailSize = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailSize), .5f);
             TrailLength = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailLength), .1f);
@@ -79,6 +80,7 @@ namespace TootTallyCustomCursor
 
             settingPage = TootTallySettingsManager.AddNewPage(new CustomCursorSettingPage());
             TootTallySettings.Plugin.TryAddThunderstoreIconToPageButton(Instance.Info.Location, Name, settingPage);
+            CustomCursor.ResolvePresets(null);
 
             _harmony.PatchAll(typeof(CustomCursorPatches));
             LogInfo($"Module loaded!");
@@ -88,6 +90,7 @@ namespace TootTallyCustomCursor
         {
             _harmony.UnpatchSelf();
             settingPage.Remove();
+            CustomCursor.UnloadTextures();
             LogInfo($"Module unloaded!");
         }  
 
@@ -98,9 +101,7 @@ namespace TootTallyCustomCursor
             public static void OnHomeStartLoadTexture(HomeController __instance)
             {
                 //Holy shit AHAH
-                (settingPage as CustomCursorSettingPage).defaultLineMat = __instance.testing_zone_mouse_text.transform.parent.parent.Find("GameSpace/NoteLinesHolder").GetChild(0).GetComponent<LineRenderer>().material;
-                (settingPage as CustomCursorSettingPage).defaultCursor = __instance.testing_zone_mouse_text.transform.parent.parent.Find("GameSpace/TargetNote").gameObject;
-                CustomCursor.ResolvePresets(null);
+                (settingPage as CustomCursorSettingPage).defaultCursor ??= __instance.testing_zone_mouse_text.transform.parent.parent.Find("GameSpace/TargetNote").gameObject;
             }
 
             [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
@@ -115,6 +116,7 @@ namespace TootTallyCustomCursor
         }
 
         public ConfigEntry<string> CursorName { get; set; }
+        public ConfigEntry<float> CursorSize { get; set; }
         public ConfigEntry<bool> CursorTrailEnabled { get; set; }
         public ConfigEntry<float> TrailSize { get; set; }
         public ConfigEntry<float> TrailLength { get; set; }
