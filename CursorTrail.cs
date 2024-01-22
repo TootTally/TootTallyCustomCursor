@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace TootTallyCustomCursor
@@ -19,7 +16,8 @@ namespace TootTallyCustomCursor
 
         public void Awake()
         {
-            _lineRenderer = gameObject.AddComponent<LineRenderer>();
+            if (!gameObject.TryGetComponent(out _lineRenderer))
+                _lineRenderer = gameObject.AddComponent<LineRenderer>();
             _lineRenderer.useWorldSpace = true;
             _verticesTimes = new Queue<float>();
             _verticesList = new List<Vector3>() { gameObject.transform.position };

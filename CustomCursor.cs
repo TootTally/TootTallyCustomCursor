@@ -92,6 +92,8 @@ namespace TootTallyCustomCursor
 
         public static bool AreAllTexturesLoaded() => _noteTargetTexture != null && _noteDotTexture != null && _noteDotGlowTexture != null && _noteDotGlow1Texture != null && _trailTexture != null;
 
+        public static bool CanApplyTextures() => _noteTargetTexture != null || _noteDotTexture != null || _noteDotGlowTexture != null || _noteDotGlow1Texture != null || _trailTexture != null;
+
         public static bool ConfigCursorNameChanged() => Plugin.Instance.CursorName.Value != _lastCursorName;
 
         public static IEnumerator<UnityWebRequestAsyncOperation> LoadCursorTexture(string filePath, Action<Texture2D> callback)
@@ -102,31 +104,41 @@ namespace TootTallyCustomCursor
             if (!webRequest.isNetworkError && !webRequest.isHttpError)
                 callback(DownloadHandlerTexture.GetContent(webRequest));
             else
-                Plugin.LogInfo("Cursor does not exist or have the wrong format.");
+                Plugin.LogInfo($"{Path.GetFileName(filePath)} does not exist or have the wrong format.");
         }
 
         public static void ApplyCustomTextureToCursor(GameController __instance)
         {
-            if (!AreAllTexturesLoaded()) return;
+            if (!CanApplyTextures()) return;
 
             Plugin.LogInfo("Applying Custom Textures to cursor.");
-
+            
             GameObject noteTarget = GameObject.Find(NOTETARGET_PATH).gameObject;
             noteTarget.transform.localScale = Vector3.one * Plugin.Instance.CursorSize.Value;
-            GameObject noteDot = GameObject.Find(NOTEDOT_PATH).gameObject;
-            GameObject noteDotGlow = GameObject.Find(NOTEDOTGLOW_PATH).gameObject;
-            GameObject noteDotGlow1 = GameObject.Find(NOTEDOTGLOW1_PATH).gameObject;
 
-
-            noteTarget.GetComponent<Image>().sprite = Sprite.Create(_noteTargetTexture, new Rect(0, 0, _noteTargetTexture.width, _noteTargetTexture.height), Vector2.one);
-            noteTarget.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteTargetTexture.width, _noteTargetTexture.height) / 2;
-            noteDot.GetComponent<Image>().sprite = Sprite.Create(_noteDotTexture, new Rect(0, 0, _noteDotTexture.width, _noteDotTexture.height), Vector2.zero);
-            noteDot.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotTexture.width, _noteDotTexture.height) / 2;
-            noteDotGlow.GetComponent<Image>().sprite = Sprite.Create(_noteDotGlowTexture, new Rect(0, 0, _noteDotGlowTexture.width, _noteDotGlowTexture.height), Vector2.zero);
-            noteDotGlow.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotGlowTexture.width, _noteDotGlowTexture.height) / 2;
-            noteDotGlow1.GetComponent<Image>().sprite = Sprite.Create(_noteDotGlow1Texture, new Rect(0, 0, _noteDotGlow1Texture.width, _noteDotGlow1Texture.height), Vector2.zero);
-            noteDotGlow1.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotGlow1Texture.width, _noteDotGlow1Texture.height) / 2;
-
+            if (_noteTargetTexture != null)
+            {
+                noteTarget.GetComponent<Image>().sprite = Sprite.Create(_noteTargetTexture, new Rect(0, 0, _noteTargetTexture.width, _noteTargetTexture.height), Vector2.one);
+                noteTarget.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteTargetTexture.width, _noteTargetTexture.height) / 2;
+            }
+            if (_noteDotTexture != null)
+            {
+                GameObject noteDot = GameObject.Find(NOTEDOT_PATH).gameObject;
+                noteDot.GetComponent<Image>().sprite = Sprite.Create(_noteDotTexture, new Rect(0, 0, _noteDotTexture.width, _noteDotTexture.height), Vector2.zero);
+                noteDot.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotTexture.width, _noteDotTexture.height) / 2;
+            }    
+            if (_noteDotGlowTexture != null)
+            {
+                GameObject noteDotGlow = GameObject.Find(NOTEDOTGLOW_PATH).gameObject;
+                noteDotGlow.GetComponent<Image>().sprite = Sprite.Create(_noteDotGlowTexture, new Rect(0, 0, _noteDotGlowTexture.width, _noteDotGlowTexture.height), Vector2.zero);
+                noteDotGlow.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotGlowTexture.width, _noteDotGlowTexture.height) / 2;
+            }
+            if (_noteDotGlow1Texture != null)
+            {
+                GameObject noteDotGlow1 = GameObject.Find(NOTEDOTGLOW1_PATH).gameObject;
+                noteDotGlow1.GetComponent<Image>().sprite = Sprite.Create(_noteDotGlow1Texture, new Rect(0, 0, _noteDotGlow1Texture.width, _noteDotGlow1Texture.height), Vector2.zero);
+                noteDotGlow1.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotGlow1Texture.width, _noteDotGlow1Texture.height) / 2;
+            }
         }
 
         public static void AddTrail(GameController __instance)
