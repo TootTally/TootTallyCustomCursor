@@ -101,7 +101,7 @@ namespace TootTallyCustomCursor
             public static void OnHomeStartLoadTexture(HomeController __instance)
             {
                 //Holy shit AHAH
-                (settingPage as CustomCursorSettingPage).defaultCursor ??= __instance.testing_zone_mouse_text.transform.parent.parent.Find("GameSpace/TargetNote").gameObject;
+                (settingPage as CustomCursorSettingPage).defaultCursor = __instance.testing_zone_mouse_text.transform.parent.parent.Find("GameSpace/TargetNote").gameObject;
             }
 
             [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]

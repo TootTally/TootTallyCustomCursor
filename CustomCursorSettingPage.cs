@@ -80,8 +80,8 @@ namespace TootTallyCustomCursor
         private GameObject _cursorPreview;
         private TootTallyAnimation _previewAnimation;
         private CursorTrail _trailPreview;
-        private Texture2D[] _textures;
-        private Texture2D _trailTexture;
+        private static Texture2D[] _textures;
+        private static Texture2D _trailTexture;
 
         public override void OnShow()
         {
