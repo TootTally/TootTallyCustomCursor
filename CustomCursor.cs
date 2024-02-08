@@ -145,7 +145,7 @@ namespace TootTallyCustomCursor
         public static void AddTrail(GameController __instance)
         {
             float scalerModifier = 1f;
-            if (__instance != null && Plugin.Instance.TrailAutoadjust.Value) //If this isn't the trail preview and trail has to be auto adjusted
+            if (Plugin.Instance.TrailAutoadjust.Value) //If this isn't the trail preview and trail has to be auto adjusted
             {
                 float aspectRatioMult = GlobalVariables.testScreenRatio() == 1610 ? 1f : 0.9f; //_StaticR-atl - Account for scroll speed being affected by aspect ratio.
                 scalerModifier = __instance.tempo * TootTallyGlobalVariables.gameSpeedMultiplier * __instance.defaultnotelength / 40600f * aspectRatioMult;
