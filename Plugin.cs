@@ -67,6 +67,7 @@ namespace TootTallyCustomCursor
             CursorName = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorName), DEFAULT_CURSORNAME);
             CursorSize = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorSize), 1f);
             CursorTrailEnabled = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorTrailEnabled), false);
+            TrailAutoadjust = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailAutoadjust), false);
             TrailSize = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailSize), .5f);
             TrailLength = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailLength), .1f);
             TrailSpeed = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailSpeed), 15f);
@@ -92,7 +93,7 @@ namespace TootTallyCustomCursor
             settingPage.Remove();
             CustomCursor.UnloadTextures();
             LogInfo($"Module unloaded!");
-        }  
+        }
 
         public static class CustomCursorPatches
         {
@@ -118,6 +119,7 @@ namespace TootTallyCustomCursor
         public ConfigEntry<string> CursorName { get; set; }
         public ConfigEntry<float> CursorSize { get; set; }
         public ConfigEntry<bool> CursorTrailEnabled { get; set; }
+        public ConfigEntry<bool> TrailAutoadjust { get; set; }
         public ConfigEntry<float> TrailSize { get; set; }
         public ConfigEntry<float> TrailLength { get; set; }
         public ConfigEntry<float> TrailSpeed { get; set; }

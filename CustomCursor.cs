@@ -112,7 +112,7 @@ namespace TootTallyCustomCursor
             if (!CanApplyTextures()) return;
 
             Plugin.LogInfo("Applying Custom Textures to cursor.");
-            
+
             GameObject noteTarget = GameObject.Find(NOTETARGET_PATH).gameObject;
             noteTarget.transform.localScale = Vector3.one * Plugin.Instance.CursorSize.Value;
 
@@ -126,7 +126,7 @@ namespace TootTallyCustomCursor
                 GameObject noteDot = GameObject.Find(NOTEDOT_PATH).gameObject;
                 noteDot.GetComponent<Image>().sprite = Sprite.Create(_noteDotTexture, new Rect(0, 0, _noteDotTexture.width, _noteDotTexture.height), Vector2.zero);
                 noteDot.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotTexture.width, _noteDotTexture.height) / 2;
-            }    
+            }
             if (_noteDotGlowTexture != null)
             {
                 GameObject noteDotGlow = GameObject.Find(NOTEDOTGLOW_PATH).gameObject;
@@ -143,12 +143,40 @@ namespace TootTallyCustomCursor
 
         public static void AddTrail(GameController __instance)
         {
+            Type ttleaderboard = Type.GetType("TootTallyLeaderboard.Replays.ReplaySystemManager, TootTallyLeaderboard"); //_StaticR-atl - TootTallyLeaderboard uses a custom game speed system.
+            float gamespeedmult = 1f;
+            if (GlobalVariables.turbomode) //_StaticR-atl - check if in base game turbo mode.
+            {
+                gamespeedmult *= 2f;
+            }
+            else if (GlobalVariables.practicemode != 1f) //_StaticR-atl - check if in base game practice mode.
+            {
+                gamespeedmult *= GlobalVariables.practicemode;
+            }
+            else if (ttleaderboard != null) //_StaticR-atl - Check if the TootTallyLeaderboard game speed system exists.
+            {
+                float ttlspeedmult = (float)ttleaderboard.GetField("gameSpeedMultiplier").GetValue(typeof(float)); //_StaticR-atl - Get the TootTallyLeaderboard gamespeed value if it exists without breaking things if it doesn't.    This was the only hard part but man it was one hell of a thing to figure out coming from 0 experience. This single line took me 3 days, half of the total time I spent here. I'm sorry Electro.
+                gamespeedmult *= ttlspeedmult;
+            }
+
+            float aspectratiomult = 1f;
+            if (GlobalVariables.testScreenRatio() == 1610) //_StaticR-atl - Account for scroll speed being affected by aspect ratio.    Would love to base this on the actual resolution the game is set to for better flexibility but the game only supports 16:9 and 16:10 so I kept it simple.
+            {
+                aspectratiomult = 0.9f;
+            }
+
+            float scalermodifier = 1f; // _StaticR-atl - Define the thing so the thing can do the thing to the thing.
+            if (Plugin.Instance.TrailAutoadjust.Value == true) // _StaticR-atl - Make the thing do the thing if you want it to do the thing but not do the thing if you don't want it to do the thing.
+            {
+                scalermodifier *= (__instance.tempo * gamespeedmult) * __instance.defaultnotelength / 40600 * aspectratiomult; // _StaticR-atl - The thing.    I initially wanted to go off of chart data directly but this seemed fine. defaultnotelength turned out to work with gametweaks spacing override out of the box which I didn't expect. That made things a lot easier.    The number is an arbitrarily chosen number that just so happens to make the trail speed line up with the scroll speed at the default of 15.
+            }
+
             if (_trailTexture != null)
             {
                 __instance.pointer.AddComponent<CursorTrail>().Init(
                    _trailTexture.height * Plugin.Instance.TrailSize.Value,
-                   Plugin.Instance.TrailLength.Value,
-                   Plugin.Instance.TrailSpeed.Value,
+                   Plugin.Instance.TrailLength.Value / scalermodifier, //_StaticR-atl - Keep trail length the same.    Honestly thank you Electro for how you coded the trail. You made it very easy to work with.
+                   Plugin.Instance.TrailSpeed.Value * scalermodifier, //_StaticR-atl - Do the thing to the thing.    This whole approach is probably scuffed at a fundamental level but I wouldn't be able to tell.
                    Plugin.Instance.TrailStartColor.Value,
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
@@ -164,8 +192,8 @@ namespace TootTallyCustomCursor
                     _trailTexture = texture;
                     __instance.pointer.AddComponent<CursorTrail>().Init(
                    _trailTexture.height * Plugin.Instance.TrailSize.Value,
-                   Plugin.Instance.TrailLength.Value,
-                   Plugin.Instance.TrailSpeed.Value,
+                   Plugin.Instance.TrailLength.Value / scalermodifier,
+                   Plugin.Instance.TrailSpeed.Value * scalermodifier,
                    Plugin.Instance.TrailStartColor.Value,
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,

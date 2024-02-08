@@ -29,7 +29,7 @@ namespace TootTallyCustomCursor
         private TootTallySettingDropdown _cursorDropdown;
         private TootTallySettingSlider _cursorSizeSlider, _trailSizeSlider, _trailLengthSlider, _trailSpeedSlider, _trailRefreshRateSlider;
         private TootTallySettingColorSliders _trailStartColorSliders, _trailEndColorSliders;
-        private TootTallySettingToggle _trailToggle;
+        private TootTallySettingToggle _trailToggle, _trailAutoadjustToggle;
 
         public CustomCursorSettingPage() : base("Custom Cursor", "Custom Cursor", 40f, new Color(0, 0, 0, 0), _pageBtnColors)
         {
@@ -37,6 +37,7 @@ namespace TootTallyCustomCursor
             _cursorSizeSlider = AddSlider("Cursor Size", .01f, 2f, Plugin.Instance.CursorSize, false);
             AddLabel("CustomTrailLabel", "Custom Trail", 24, FontStyles.Normal, TextAlignmentOptions.BottomLeft);
             _trailToggle = AddToggle("Enable Cursor Trail", Plugin.Instance.CursorTrailEnabled);
+            _trailAutoadjustToggle = AddToggle("Auto adjust Trail speed", Plugin.Instance.TrailAutoadjust);
             _trailSizeSlider = AddSlider("Trail Size", 0, 1, Plugin.Instance.TrailSize, false);
             _trailLengthSlider = AddSlider("Trail Length", 0, 1, Plugin.Instance.TrailLength, false);
             _trailSpeedSlider = AddSlider("Trail Speed", 0, 100, Plugin.Instance.TrailSpeed, false);
