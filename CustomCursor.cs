@@ -145,18 +145,21 @@ namespace TootTallyCustomCursor
         public static void AddTrail(GameController __instance)
         {
             float scalerModifier = 1f;
-            if (Plugin.Instance.TrailAutoadjust.Value) //If this isn't the trail preview and trail has to be auto adjusted
+            float trailSpeed = Plugin.Instance.TrailSpeed.Value;
+            if (Plugin.Instance.TrailAdjustTrailSpeed.Value) //If this isn't the trail preview and trail has to be auto adjusted
             {
                 float aspectRatioMult = GlobalVariables.testScreenRatio() == 1610 ? 1f : 0.9f; //_StaticR-atl - Account for scroll speed being affected by aspect ratio.
                 scalerModifier = __instance.tempo * TootTallyGlobalVariables.gameSpeedMultiplier * __instance.defaultnotelength / 40600f * aspectRatioMult;
+                trailSpeed = 17f * scalerModifier; //Hard coded 17f trail speed
             }
+
 
             if (_trailTexture != null)
             {
                 __instance.pointer.AddComponent<CursorTrail>().Init(
                    _trailTexture.height * Plugin.Instance.TrailSize.Value,
                    Plugin.Instance.TrailLength.Value / scalerModifier, //_StaticR-atl - Keep trail length the same.
-                   Plugin.Instance.TrailSpeed.Value * scalerModifier,
+                   trailSpeed,
                    Plugin.Instance.TrailStartColor.Value,
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
@@ -173,7 +176,7 @@ namespace TootTallyCustomCursor
                     __instance.pointer.AddComponent<CursorTrail>().Init(
                    _trailTexture.height * Plugin.Instance.TrailSize.Value,
                    Plugin.Instance.TrailLength.Value / scalerModifier,
-                   Plugin.Instance.TrailSpeed.Value * scalerModifier,
+                   trailSpeed,
                    Plugin.Instance.TrailStartColor.Value,
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
