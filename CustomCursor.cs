@@ -148,9 +148,9 @@ namespace TootTallyCustomCursor
             float trailSpeed = Plugin.Instance.TrailSpeed.Value;
             if (Plugin.Instance.TrailAdjustTrailSpeed.Value) //If this isn't the trail preview and trail has to be auto adjusted
             {
-                float aspectRatioMult = GlobalVariables.testScreenRatio() == 1610 ? .9f : 1f; //_StaticR-atl - Account for scroll speed being affected by aspect ratio.
+                float aspectRatioMult = GlobalVariables.testScreenRatio() == 1610 ? .9f : 1f; //Account for aspect ratio.
                 scalerModifier = __instance.tempo * TootTallyGlobalVariables.gameSpeedMultiplier * __instance.defaultnotelength / 40600f * aspectRatioMult;
-                trailSpeed = 17f * scalerModifier; //Hard coded 17f trail speed
+                trailSpeed *= scalerModifier;
             }
 
 
@@ -158,7 +158,7 @@ namespace TootTallyCustomCursor
             {
                 __instance.pointer.AddComponent<CursorTrail>().Init(
                    _trailTexture.height * Plugin.Instance.TrailSize.Value,
-                   Plugin.Instance.TrailLength.Value / scalerModifier, //_StaticR-atl - Keep trail length the same.
+                   Plugin.Instance.TrailLength.Value / scalerModifier, //Keep trail length the same.
                    trailSpeed,
                    Plugin.Instance.TrailStartColor.Value,
                    Plugin.Instance.TrailEndColor.Value,
