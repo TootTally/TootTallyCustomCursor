@@ -56,7 +56,7 @@ namespace TootTallyCustomCursor
                 CustomCursor.ResolvePresets(null);
             });
             _trailToggle.toggle.onValueChanged.AddListener(OnTrailToggle);
-            _trailAutoadjustToggle.toggle.onValueChanged.AddListener(OnAutoResizeValueUpdate);
+            //_trailAutoadjustToggle.toggle.onValueChanged.AddListener(OnAutoResizeValueUpdate);
             _cursorSizeSlider.slider.onValueChanged.AddListener(OnCursorSizeChange);
             _trailStartColorSliders.sliderR.onValueChanged.AddListener(UpdateColor);
             _trailStartColorSliders.sliderG.onValueChanged.AddListener(UpdateColor);
@@ -68,15 +68,15 @@ namespace TootTallyCustomCursor
             _trailSpeedSlider.slider.onValueChanged.AddListener(value => _trailPreview?.SetTrailSpeed(value * 3.4f));
             _trailSizeSlider.slider.onValueChanged.AddListener(value => _trailPreview?.SetWidth(value * _trailTexture.height * 2f));
             _trailRefreshRateSlider.slider.onValueChanged.AddListener(value => _trailPreview?.SetRefreshRate((int)value));
-            OnAutoResizeValueUpdate(Plugin.Instance.TrailAdjustTrailSpeed.Value);
+            //OnAutoResizeValueUpdate(Plugin.Instance.TrailAdjustTrailSpeed.Value);
         }
 
-        private void OnAutoResizeValueUpdate(bool value)
+    /*   private void OnAutoResizeValueUpdate(bool value) // Disable Scroll Speed slider when autoadjust is active.
         {
             _trailSpeedSlider.slider.gameObject.SetActive(!value);
             _trailPreview?.SetTrailSpeed((value ? 17f : _trailSpeedSlider.slider.value) * 3.4f);
         }
-
+    */
         private void OnCursorSizeChange(float value)
         {
             _cursorPreview.transform.localScale = Vector3.one * value;
