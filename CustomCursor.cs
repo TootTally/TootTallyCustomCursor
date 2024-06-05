@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using UnityEngine;
 using UnityEngine.UI;
+using TootTallyCore.Utils.TootTallyGlobals;
 
 namespace TootTallyCustomCursor
 {
@@ -112,7 +113,7 @@ namespace TootTallyCustomCursor
             if (!CanApplyTextures()) return;
 
             Plugin.LogInfo("Applying Custom Textures to cursor.");
-            
+
             GameObject noteTarget = GameObject.Find(NOTETARGET_PATH).gameObject;
             noteTarget.transform.localScale = Vector3.one * Plugin.Instance.CursorSize.Value;
 
@@ -126,7 +127,7 @@ namespace TootTallyCustomCursor
                 GameObject noteDot = GameObject.Find(NOTEDOT_PATH).gameObject;
                 noteDot.GetComponent<Image>().sprite = Sprite.Create(_noteDotTexture, new Rect(0, 0, _noteDotTexture.width, _noteDotTexture.height), Vector2.zero);
                 noteDot.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotTexture.width, _noteDotTexture.height) / 2;
-            }    
+            }
             if (_noteDotGlowTexture != null)
             {
                 GameObject noteDotGlow = GameObject.Find(NOTEDOTGLOW_PATH).gameObject;
@@ -143,12 +144,22 @@ namespace TootTallyCustomCursor
 
         public static void AddTrail(GameController __instance)
         {
+            float scalerModifier = 1f;
+            float trailSpeed = Plugin.Instance.TrailSpeed.Value;
+            if (Plugin.Instance.TrailAdjustTrailSpeed.Value) //If this isn't the trail preview and trail has to be auto adjusted
+            {
+                float aspectRatioMult = GlobalVariables.testScreenRatio() == 1610 ? .9f : 1f; //_StaticR-atl - Account for scroll speed being affected by aspect ratio.
+                scalerModifier = __instance.tempo * TootTallyGlobalVariables.gameSpeedMultiplier * __instance.defaultnotelength / 40600f * aspectRatioMult;
+                trailSpeed = 17f * scalerModifier; //Hard coded 17f trail speed
+            }
+
+
             if (_trailTexture != null)
             {
                 __instance.pointer.AddComponent<CursorTrail>().Init(
                    _trailTexture.height * Plugin.Instance.TrailSize.Value,
-                   Plugin.Instance.TrailLength.Value,
-                   Plugin.Instance.TrailSpeed.Value,
+                   Plugin.Instance.TrailLength.Value / scalerModifier, //_StaticR-atl - Keep trail length the same.
+                   trailSpeed,
                    Plugin.Instance.TrailStartColor.Value,
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
@@ -164,8 +175,8 @@ namespace TootTallyCustomCursor
                     _trailTexture = texture;
                     __instance.pointer.AddComponent<CursorTrail>().Init(
                    _trailTexture.height * Plugin.Instance.TrailSize.Value,
-                   Plugin.Instance.TrailLength.Value,
-                   Plugin.Instance.TrailSpeed.Value,
+                   Plugin.Instance.TrailLength.Value / scalerModifier,
+                   trailSpeed,
                    Plugin.Instance.TrailStartColor.Value,
                    Plugin.Instance.TrailEndColor.Value,
                    __instance.notelinesholder.transform.GetChild(0).GetComponent<LineRenderer>().material,
