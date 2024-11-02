@@ -85,7 +85,7 @@ namespace TootTallyCustomCursor
 
         public static void OnAllTextureLoadedAfterConfigChange(GameController __instance)
         {
-            if (__instance == null) return;
+            if (__instance == null || !__instance.pointer.activeSelf) return;
             ApplyCustomTextureToCursor(__instance);
             _lastCursorName = Plugin.Instance.CursorName.Value;
 
@@ -144,6 +144,8 @@ namespace TootTallyCustomCursor
 
         public static void AddTrail(GameController __instance)
         {
+            if (!__instance.pointer.activeSelf) return;
+
             float scalerModifier = 1f;
             float trailSpeed = Plugin.Instance.TrailSpeed.Value;
             if (Plugin.Instance.TrailAdjustTrailSpeed.Value) //If this isn't the trail preview and trail has to be auto adjusted
