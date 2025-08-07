@@ -67,6 +67,7 @@ namespace TootTallyCustomCursor
             CursorName = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorName), DEFAULT_CURSORNAME);
             CursorSize = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorSize), 1f);
             CursorTrailEnabled = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorTrailEnabled), false);
+            CursorColor = config.Bind(CURSOR_CONFIG_FIELD, nameof(CursorColor), Color.white, "Color hue shift for the cursor.");
             TrailAdjustTrailSpeed = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailAdjustTrailSpeed), false, "Automatically adjust the speed of the trail to match the scroll speed.");
             TrailSize = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailSize), .5f);
             TrailLength = config.Bind(CURSOR_CONFIG_FIELD, nameof(TrailLength), .1f);
@@ -119,6 +120,7 @@ namespace TootTallyCustomCursor
         public ConfigEntry<string> CursorName { get; set; }
         public ConfigEntry<float> CursorSize { get; set; }
         public ConfigEntry<bool> CursorTrailEnabled { get; set; }
+        public ConfigEntry<Color> CursorColor { get; set; }
         public ConfigEntry<bool> TrailAdjustTrailSpeed { get; set; }
         public ConfigEntry<float> TrailSize { get; set; }
         public ConfigEntry<float> TrailLength { get; set; }

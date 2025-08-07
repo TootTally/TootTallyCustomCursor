@@ -119,25 +119,33 @@ namespace TootTallyCustomCursor
 
             if (_noteTargetTexture != null)
             {
-                noteTarget.GetComponent<Image>().sprite = Sprite.Create(_noteTargetTexture, new Rect(0, 0, _noteTargetTexture.width, _noteTargetTexture.height), Vector2.one);
+                var targetImage = noteTarget.GetComponent<Image>();
+                targetImage.sprite = Sprite.Create(_noteTargetTexture, new Rect(0, 0, _noteTargetTexture.width, _noteTargetTexture.height), Vector2.one);
+                targetImage.color = Plugin.Instance.CursorColor.Value;
                 noteTarget.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteTargetTexture.width, _noteTargetTexture.height) / 2;
             }
             if (_noteDotTexture != null)
             {
                 GameObject noteDot = GameObject.Find(NOTEDOT_PATH).gameObject;
-                noteDot.GetComponent<Image>().sprite = Sprite.Create(_noteDotTexture, new Rect(0, 0, _noteDotTexture.width, _noteDotTexture.height), Vector2.zero);
+                var dotImage = noteDot.GetComponent<Image>();
+                dotImage.sprite = Sprite.Create(_noteDotTexture, new Rect(0, 0, _noteDotTexture.width, _noteDotTexture.height), Vector2.zero);
+                dotImage.color = Plugin.Instance.CursorColor.Value;
                 noteDot.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotTexture.width, _noteDotTexture.height) / 2;
             }
             if (_noteDotGlowTexture != null)
             {
                 GameObject noteDotGlow = GameObject.Find(NOTEDOTGLOW_PATH).gameObject;
-                noteDotGlow.GetComponent<Image>().sprite = Sprite.Create(_noteDotGlowTexture, new Rect(0, 0, _noteDotGlowTexture.width, _noteDotGlowTexture.height), Vector2.zero);
+                var dotGlowImage = noteDotGlow.GetComponent<Image>();
+                dotGlowImage.sprite = Sprite.Create(_noteDotGlowTexture, new Rect(0, 0, _noteDotGlowTexture.width, _noteDotGlowTexture.height), Vector2.zero);
+                //dotGlowImage.color = Plugin.Instance.CursorColor.Value;
                 noteDotGlow.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotGlowTexture.width, _noteDotGlowTexture.height) / 2;
             }
             if (_noteDotGlow1Texture != null)
             {
                 GameObject noteDotGlow1 = GameObject.Find(NOTEDOTGLOW1_PATH).gameObject;
-                noteDotGlow1.GetComponent<Image>().sprite = Sprite.Create(_noteDotGlow1Texture, new Rect(0, 0, _noteDotGlow1Texture.width, _noteDotGlow1Texture.height), Vector2.zero);
+                var dotGlow1Image = noteDotGlow1.GetComponent<Image>();
+                dotGlow1Image.sprite = Sprite.Create(_noteDotGlow1Texture, new Rect(0, 0, _noteDotGlow1Texture.width, _noteDotGlow1Texture.height), Vector2.zero);
+                //dotGlow1Image.color = Plugin.Instance.CursorColor.Value;
                 noteDotGlow1.GetComponent<RectTransform>().sizeDelta = new Vector2(_noteDotGlow1Texture.width, _noteDotGlow1Texture.height) / 2;
             }
         }

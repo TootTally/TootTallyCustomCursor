@@ -28,7 +28,7 @@ namespace TootTallyCustomCursor
 
         private TootTallySettingDropdown _cursorDropdown;
         private TootTallySettingSlider _cursorSizeSlider, _trailSizeSlider, _trailLengthSlider, _trailSpeedSlider, _trailRefreshRateSlider;
-        private TootTallySettingColorSliders _trailStartColorSliders, _trailEndColorSliders;
+        private TootTallySettingColorSliders _cursorColorSliders, _trailStartColorSliders, _trailEndColorSliders;
         private TootTallySettingToggle _trailToggle, _trailAutoadjustToggle;
 
         public CustomCursorSettingPage() : base("Custom Cursor", "Custom Cursor", 40f, new Color(0, 0, 0, 0), _pageBtnColors)
@@ -36,6 +36,8 @@ namespace TootTallyCustomCursor
             _cursorDropdown = CreateDropdownFromFolder(Plugin.CURSORS_FOLDER_PATH, Plugin.Instance.CursorName, Plugin.DEFAULT_CURSORNAME);
             _cursorSizeSlider = AddSlider("Cursor Size", .01f, 2f, Plugin.Instance.CursorSize, false);
             AddLabel("CustomTrailLabel", "Custom Trail", 24, FontStyles.Normal, TextAlignmentOptions.BottomLeft);
+            AddLabel("Cursor Color Shift");
+            _cursorColorSliders = AddColorSliders("Cursor Color", "Cursor Color", Plugin.Instance.CursorColor);
             _trailToggle = AddToggle("Enable Cursor Trail", Plugin.Instance.CursorTrailEnabled);
             _trailAutoadjustToggle = AddToggle("Auto adjust Trail speed", Plugin.Instance.TrailAdjustTrailSpeed);
             _trailSizeSlider = AddSlider("Trail Size", 0, 1, Plugin.Instance.TrailSize, false);
@@ -55,6 +57,9 @@ namespace TootTallyCustomCursor
             {
                 CustomCursor.ResolvePresets(null);
             });
+            _cursorColorSliders.sliderR.onValueChanged.AddListener(UpdateColor);
+            _cursorColorSliders.sliderG.onValueChanged.AddListener(UpdateColor);
+            _cursorColorSliders.sliderB.onValueChanged.AddListener(UpdateColor);
             _trailToggle.toggle.onValueChanged.AddListener(OnTrailToggle);
             _trailAutoadjustToggle.toggle.onValueChanged.AddListener(OnAutoResizeValueUpdate);
             _cursorSizeSlider.slider.onValueChanged.AddListener(OnCursorSizeChange);
@@ -82,11 +87,20 @@ namespace TootTallyCustomCursor
             _cursorPreview.transform.localScale = Vector3.one * value;
         }
 
-        private void UpdateColor(float f) => _trailPreview?.UpdateColors();
+        private void UpdateColor(float f)
+        {
+            if (_cursorPreviewTargetImage != null)
+                _cursorPreviewTargetImage.color = Plugin.Instance.CursorColor.Value;
+            if (_cursorPreviewDotImage != null)
+                _cursorPreviewDotImage.color = Plugin.Instance.CursorColor.Value;
+
+            _trailPreview?.UpdateColors();
+        }
 
         public GameObject defaultCursor;
 
         private GameObject _cursorPreview;
+        private Image _cursorPreviewTargetImage, _cursorPreviewDotImage;
         private TootTallyAnimation _previewAnimation;
         private CursorTrail _trailPreview;
         private static Texture2D[] _textures;
@@ -120,16 +134,20 @@ namespace TootTallyCustomCursor
             if (Plugin.Instance.CursorName.Value != Plugin.DEFAULT_CURSORNAME)
             {
                 _textures = CustomCursor.GetTextures;
-                _cursorPreview.GetComponent<Image>().sprite = Sprite.Create(_textures[0], new Rect(0, 0, _textures[0].width, _textures[0].height), Vector2.one);
+                _cursorPreviewTargetImage = _cursorPreview.GetComponent<Image>();
+                _cursorPreviewTargetImage.sprite = Sprite.Create(_textures[0], new Rect(0, 0, _textures[0].width, _textures[0].height), Vector2.one);
                 _cursorPreview.GetComponent<RectTransform>().sizeDelta = new Vector2(_textures[0].width, _textures[0].height);
                 _cursorPreview.GetComponent<RectTransform>().pivot = Vector2.one / 2f;
-                noteDot.GetComponent<Image>().sprite = Sprite.Create(_textures[1], new Rect(0, 0, _textures[1].width, _textures[1].height), Vector2.zero);
+                _cursorPreviewDotImage = noteDot.GetComponent<Image>();
+                _cursorPreviewDotImage.sprite = Sprite.Create(_textures[1], new Rect(0, 0, _textures[1].width, _textures[1].height), Vector2.zero);
                 noteDot.GetComponent<RectTransform>().sizeDelta = new Vector2(_textures[1].width, _textures[1].height);
             }
             else
             {
-                var image = _cursorPreview.GetComponent<Image>().mainTexture as Texture2D;
-                var image2 = noteDot.GetComponent<Image>().mainTexture as Texture2D;
+                _cursorPreviewTargetImage = _cursorPreview.GetComponent<Image>();
+                var image = _cursorPreviewTargetImage.mainTexture as Texture2D;
+                _cursorPreviewDotImage = noteDot.GetComponent<Image>();
+                var image2 = _cursorPreviewDotImage.mainTexture as Texture2D;
                 _cursorPreview.GetComponent<RectTransform>().sizeDelta = new Vector2(image.width, image.height);
                 _cursorPreview.GetComponent<RectTransform>().pivot = Vector2.one / 2f;
                 noteDot.GetComponent<RectTransform>().sizeDelta = new Vector2(image2.width, image2.height);
