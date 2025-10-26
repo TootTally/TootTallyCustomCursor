@@ -48,6 +48,8 @@ namespace TootTallyCustomCursor
             _trailStartColorSliders = AddColorSliders("Trail Start Color", "Trail Start Color", Plugin.Instance.TrailStartColor);
             AddLabel("Trail End Color");
             _trailEndColorSliders = AddColorSliders("Trail End Color", "Trail End Color", Plugin.Instance.TrailEndColor);
+            if (TootTallySettingsManager.isInitialized)
+                Initialize();
         }
 
         public override void Initialize()
